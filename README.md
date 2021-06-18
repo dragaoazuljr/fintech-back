@@ -24,7 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+[Nest](https://github.com/nestjs/nest) API for a fintech bank, with login, dashboard and transactions.
 
 ## Installation
 
@@ -35,6 +35,9 @@ $ npm install
 ## Running the app
 
 ```bash
+# config .env file using the .env.model
+$ cp .env.model .env
+
 # development
 $ npm run start
 
