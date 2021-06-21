@@ -24,8 +24,8 @@ export class UsersService {
 		return await userCreated.save();
 	}
 
-	findUserByLogin( login: string ) {
-		return this.userModel.find({ login }).exec();
+	findUserByLogin( email: string ) {
+		return this.userModel.findOne({ email }).exec();
 	}
 
 	findUser(

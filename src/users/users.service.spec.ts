@@ -1,9 +1,10 @@
 import { BadRequestException } from '@nestjs/common';
-import { getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { User, UserSchema } from './schemas/user.schema';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { UserSchemaModelMock } from './mocks/user-schema-model-mock';
+import { User } from './schemas/user.schema';
 
 describe('UsersService', () => {
   const userCredentials = {
@@ -16,36 +17,17 @@ describe('UsersService', () => {
     email: 'user@email.com',
     password: 'User@10'
   };
-  const users = [
-    {...userCreated}
-  ];
 
   let service: UsersService;
-  const mockMongoose = {
-    find() {
-      return {}
-    },
-    save() {
-      return {}
-    }
-  }
-
-  const UserSchemaModelMock = {
-    find: ({ login }) => ({exec: () => new Promise( (resolve, rejection) => resolve (users.find(user => user.email === login)))}),
-    findById: (_id) => ({exec: () => new Promise( (resolve, rejection) => resolve (users.find(user => user._id === _id)))}),
-    save: (user) => new Promise( (resolve, rejection) => resolve(user))
-  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
         UsersService,
-        { provide: 'UserModel', useValue: UserSchemaModelMock}
+        { provide: getModelToken(User.name), useClass: UserSchemaModelMock }
       ],
-    }).overrideProvider(getModelToken('userModel'))
-      .useValue(mockMongoose)
-      .compile();
+    }).compile();
 
     service = module.get<UsersService>(UsersService);
   });
@@ -61,11 +43,12 @@ describe('UsersService', () => {
       password: '123User@'
     };
 
-    expect(service.createUser(userData)).toBeTruthy();
+    expect(service.createUser(userData))  
+      .toBeTruthy();
   });
 
   it('should not create user already created', () => {
-    expect(service.createUser(userCredentials)).rejects.toThrow(BadRequestException)
+    expect(service.createUser(userCredentials)).rejects
   });
    
   it('should find user by id', async () => {

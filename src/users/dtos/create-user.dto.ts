@@ -9,7 +9,6 @@ export class CreateUserDto {
 	@IsEmail()
 	email: string;
 
-	@IsAlphanumeric()
 	@IsNotEmpty()
 	@MinLength(6)
 	@MaxLength(20)

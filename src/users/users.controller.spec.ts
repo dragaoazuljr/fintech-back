@@ -1,53 +1,29 @@
 import { INestApplication } from '@nestjs/common';
+import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersController } from './users.controller';
 import * as request from 'supertest';
+import { mockMongoose } from './mocks/user-schema-model-mock';
+import { UserMockService } from './mocks/user-service.mock';
+import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-
-/* jest.mock('@nestjs/mongoose', () => ({
-  MongooseModule: {
-    forRoot: () => {},
-    Prop: () => {}
-  }
-})) */
-import { getModelToken, MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './schemas/user.schema';
-import { ConfigModule } from '@nestjs/config';
 
 
 describe('UsersController', () => {
-  const userCredentials = {
-    email: 'user@email.com',
-    password: 'User@10'
-  };
   const userCreated = {
     _id: 1,
     email: 'user@email.com',
     password: 'User@10'
   };
-  const users = [
-    {...userCreated}
-  ];
-
-  const mockMongoose = {
-    find() {
-      return {}
-    }
-  }
 
   let controller: UsersController;
   let app: INestApplication;
-  let userService = {
-    createUser: () => new Promise((resolve, reject) => resolve(userCreated)),
-    findUserBylogin: (login) => new Promise(resolve => resolve(users.find(user => user.email === login))),
-    findUser: (_id) => new Promise(resolve => resolve(users.find(user => user._id === _id)))
-  }
+  
   
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
-        { provide: UsersService, useValue: userService }
+        { provide: UsersService, useClass: UserMockService }
       ]
     })
       .overrideProvider(getModelToken('User'))
@@ -56,17 +32,66 @@ describe('UsersController', () => {
 
     controller = module.get<UsersController>(UsersController);
     app = module.createNestApplication();
+
+    await app.init()
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
-  // it('should not create user with a not safe password', () => {});
-  
-  // it('should not create user with a invalid email', () => {});
-  
-  // it('should not create user that already existl', () => {});
+  it('should not create user with a not safe password', (done) => {
+    let userCreateData = {
+      name: "User test",
+      email: "user@test.com",
+      password: "123"
+    }
+
+    request(app.getHttpServer())
+      .post("/users")
+      .send(userCreateData)
+      .expect(400)
+      .expect(res => {
+        if (!res.body.message) throw new Error ("missing error message");
+        if (!res.body.message.includes("password too weak")) throw new Error ("missing password too weak message");
+        if (!res.body.message.includes("password must be longer than or equal to 6 characters")) throw new Error ("missing password min size validation");
+      })
+      .end(done)
+  });
+
+  it('should not create user with empty password', (done) => {
+    const userCreateData = {
+      name: "User Test",
+      email: "user@test.com",
+      password: ""
+    };
+
+    request(app.getHttpServer())
+      .post("/users")
+      .send(userCreateData)
+      .expect(400)
+      .expect(res => {
+        if (!res.body.message.includes("password should not be empty")) throw new Error ("missing empty password validation");
+      })
+      .end(done)
+  })
+
+  it('should not create user with a invalid email', (done) => {
+    const userCreateData = {
+      name: "user test",
+      email: "danillo.moraes",
+      password: "User@123"      
+    };
+
+    request(app.getHttpServer())
+      .post("/users")
+      .send(userCreateData)
+      .expect(400)
+      .expect(res => {
+        if (!res.body.message.includes("email must be an email")) throw new Error ("missing type email validation");
+      })
+      .end(done)
+  });
   
   // it('should find user by _id', () => {});
   
