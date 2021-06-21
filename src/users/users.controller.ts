@@ -9,6 +9,11 @@ export class UsersController {
 		private _userService: UsersService
 	) {}
 
+	@Get()
+	async getAllUsers(){
+		return this._userService.getAllUsers()
+	}
+
 	@Get(':_id')
 	async findUser(
 		@Param('_id') _id: string

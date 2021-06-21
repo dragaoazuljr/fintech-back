@@ -5,5 +5,5 @@ export class LoginUserDto {
 	email: string
 
 	@IsNotEmpty()
-	passoword: string;
+	password: string;
 }
