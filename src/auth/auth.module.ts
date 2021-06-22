@@ -11,6 +11,7 @@ import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   controllers: [AuthController],
@@ -24,7 +25,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         signOptions: {
           expiresIn: "4h"
         },
-        secretOrPrivateKey: configService.get('JWT_SECRET')
+        secret: configService.get('JWT_SECRET'),
+        ignoreExpiration: false
       }),
       inject: [ConfigService]
     })
@@ -35,10 +37,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     LocalStrategy,
     LocalAuthGuard,
     JwtStrategy,
-    JwtService
+    JwtAuthGuard
   ],
   exports: [
-    AuthService
+    AuthService,
+    JwtModule,
+    JwtAuthGuard
   ]
 })
 export class AuthModule {}

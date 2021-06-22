@@ -25,7 +25,7 @@ export class UsersService {
 	}
 
 	findUserByLogin( email: string ) {
-		return this.userModel.findOne({ email }).exec();
+		return this.userModel.findOne({ email }).lean().exec();
 	}
 
 	async getAllUsers() {
