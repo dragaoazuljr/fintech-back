@@ -16,7 +16,6 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 @Module({
   controllers: [AuthController],
   imports: [
-    UsersModule,
     PassportModule.register({ defaultStrategy: "jwt" }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema}]),
     JwtModule.registerAsync({

@@ -18,6 +18,12 @@ export class UserSchemaModelMock {
 			exec: () => new Promise((resolve, rejection) => {
 				const user = this.users.find(user => user.email === email);
 				user ? resolve(user) : rejection(false);
+			}),
+			lean: () => ({
+				exec: () => new Promise((resolve, rejection) => {
+					const user = this.users.find(user => user.email === email);
+					user ? resolve(user) : rejection(false);
+				})
 			})
 		}
 	}
@@ -27,6 +33,12 @@ export class UserSchemaModelMock {
 			exec: () => new Promise((resolve, rejection) => {
 				const user = this.users.find(user => user.email === email);
 				user ? resolve(user) : rejection(undefined);
+			}),
+			lean: () => ({
+				exec: () => new Promise((resolve, rejection) => {
+					const user = this.users.find(user => user.email === email);
+					user ? resolve(user) : rejection(undefined);
+				})
 			})
 		}
 	}

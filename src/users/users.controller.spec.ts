@@ -3,7 +3,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { mockMongoose } from './mocks/user-schema-model-mock';
-import { UserMockService } from './mocks/user-service.mock';
+import { UserMockClassService } from './mocks/user-service.mock';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
@@ -23,7 +23,7 @@ describe('UsersController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
-        { provide: UsersService, useClass: UserMockService }
+        { provide: UsersService, useClass: UserMockClassService }
       ]
     })
       .overrideProvider(getModelToken('User'))

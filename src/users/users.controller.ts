@@ -1,6 +1,6 @@
 import { Body, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Controller, Get } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 
