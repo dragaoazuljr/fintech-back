@@ -1,6 +1,8 @@
+import { rejects } from "assert";
+
 export class UserMockClassService {
 	userCreated = {
-		_id: 1,
+		_id: "1",
 		email: 'user@email.com',
 		password: 'User@10'
 	};
@@ -19,7 +21,16 @@ export class UserMockClassService {
 	}
 
     findUser (_id) {
-		return new Promise(resolve => resolve(this.users.find(user => user._id === _id)))
+		return new Promise((resolve, reject) => {
+			const user = this.users.find(user => user._id === _id)
+
+			if (user) {
+				resolve(user);
+			} else {
+				reject("Invalid user id")
+				throw new Error ("Invalid user id")
+			}
+		})
 	}
 }
 

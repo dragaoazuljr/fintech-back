@@ -4,6 +4,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { PixModule } from './pix/pix.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -20,7 +23,10 @@ import { JwtModule } from '@nestjs/jwt';
         secretOrPrivateKey: configService.get('JWT_SECRET')
       }),
       inject: [ConfigService]
-    })
+    }),
+    DashboardModule,
+    PixModule,
+    TransactionsModule
   ],
   controllers: [],
   providers: [],
