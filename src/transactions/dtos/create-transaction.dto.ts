@@ -1,4 +1,4 @@
-import { IsAlpha, IsNotEmpty, IsNumber, Length, MinLength } from "class-validator";
+import { IsAlpha, IsNotEmpty, IsNumber, IsUppercase, Length, MinLength } from "class-validator";
 
 export class CreateTransactionDto {
 	@IsNotEmpty()
@@ -12,7 +12,8 @@ export class CreateTransactionDto {
 	value: number;
 
 	@IsNotEmpty()
-	@IsAlpha()
+	@IsUppercase()
+	@IsAlpha('pt-BR', {message: "currency must contains only letters"})
 	@Length(3, 3, {message: "invalid currency"})
 	currency: string;
 	

@@ -34,24 +34,26 @@ export class PixSchemaModelMock {
 			},
 			lean: function() {
 				return {
-					exec: function() {
-						return new Promise((resolve, reject) => {
-							const pixKeys = [
-								{
-									user: "1",
-									key: "user@email.com",
-									label: "email"
+					populate: () => ({
+						exec: function() {
+							return new Promise((resolve, reject) => {
+								const pixKeys = [
+									{
+										user: "1",
+										key: "user@email.com",
+										label: "email"
+									}
+								]
+								try {
+									const keys = pixKeys.filter(pix => pix.key === search.key);
+			
+									resolve(keys)
+								} catch (err) {
+									reject(err)
 								}
-							]
-							try {
-								const keys = pixKeys.filter(pix => pix.key === search.key);
-		
-								resolve(keys)
-							} catch (err) {
-								reject(err)
-							}
-						})
-					} 
+							})
+						} 
+					})
 				}
 			}
 		}

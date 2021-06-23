@@ -44,8 +44,12 @@ export class PixService {
 		return pixKey.save();
 	}
 
-	getPixKeyByKey(key: string){
-		return this.pixModel.find({key}).lean().exec()
+	getPixKeyByKey(key: string): Promise<Pix[]>{
+		return this.pixModel
+			.find({key})
+			.lean()
+			.populate('user')
+			.exec()
 	}
 
 	async removePixKey(

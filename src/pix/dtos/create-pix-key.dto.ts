@@ -6,7 +6,6 @@ export class CreatePixKeyDto {
 	user: string;
 
 	@IsNotEmpty()
-	@IsAlphanumeric()
 	key: string;
 
 	@IsNotEmpty()

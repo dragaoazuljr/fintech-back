@@ -1,5 +1,6 @@
-import { Body, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Body, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Controller, Get } from '@nestjs/common';
+import { TransactionsService } from 'src/transactions/transactions.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -7,7 +8,8 @@ import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
 	constructor(
-		private _userService: UsersService
+		private _userService: UsersService,
+		private _transactionsService: TransactionsService
 	) {}
 
 	@UseGuards(JwtAuthGuard)
@@ -28,6 +30,14 @@ export class UsersController {
 	async createUser (
 		@Body() createUserDto: CreateUserDto
 	) {
-		return this._userService.createUser(createUserDto)
+		const user = 
+			await this._userService.createUser(createUserDto)
+				.catch(err => { throw new BadRequestException(err)});
+
+		if(!createUserDto.initialValue) return user
+
+		await this._transactionsService.createInitialTransaction(createUserDto, user._id.toString())
+
+		return user
 	}
 }
