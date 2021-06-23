@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsEmail, IsNotEmpty, IsString, Length, Matches, MaxLength, MinLength } from "class-validator";
+import { IsAlpha, IsAlphanumeric, IsEmail, IsNotEmpty, IsString, IsUppercase, Length, Matches, MaxLength, MinLength, ValidateIf } from "class-validator";
 
 export class CreateUserDto {
 	@IsNotEmpty()
@@ -14,4 +14,13 @@ export class CreateUserDto {
 	@MaxLength(20)
 	@Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {message: 'password too weak'})
 	password: string;
+
+	initialValue: number
+
+	@IsNotEmpty()
+	@IsUppercase()
+	@IsAlpha('pt-BR', {message: "currency must contains only letters"})
+	@Length(3, 3, {message: "invalid currency"})
+	@ValidateIf((obj: CreateUserDto) => !!obj.initialValue)
+	currency: string
 }

@@ -7,7 +7,7 @@ export type TransactionDocument = Transaction & Document;
 
 @Schema()
 export class Transaction {
-	_id: string;
+	_id?: string;
 
 	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User" })
 	userFrom: User
@@ -26,6 +26,13 @@ export class Transaction {
 
 	@Prop()
 	currency: string;
+
+	type?: TransactionType
 } 
+
+export enum TransactionType {
+	DEBIT = "DEBIT",
+	CREDIT = "CREDIT"
+}
 
 export const TransacionSchema = SchemaFactory.createForClass(Transaction);

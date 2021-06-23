@@ -17,10 +17,13 @@ import { TransactionsService } from './transactions.service';
   ],
   controllers: [TransactionsController],
   providers: [
-    TransactionsService,
     JwtAuthGuard,
     UsersService,
-    PixService
+    PixService,
+    TransactionsService
+  ],
+  exports: [
+    TransactionsService
   ]
 })
 export class TransactionsModule {}

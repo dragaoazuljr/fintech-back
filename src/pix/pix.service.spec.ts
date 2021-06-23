@@ -50,6 +50,7 @@ describe('PixService', () => {
 
     expect(service.createPixKey(pixData, "1"))
       .rejects
+      .toThrow(BadRequestException)
   })
 
   it("should create key with same label", () => {
@@ -61,6 +62,7 @@ describe('PixService', () => {
 
     expect(service.createPixKey(pixData, "1"))
       .rejects
+      .toThrow(BadRequestException)
   })
   
   it("should not create pix key when request user is different from payload", () => {
