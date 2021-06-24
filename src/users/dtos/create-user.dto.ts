@@ -15,12 +15,12 @@ export class CreateUserDto {
 	@Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {message: 'password too weak'})
 	password: string;
 
-	initialValue: number
+	initialValue?: number
 
 	@IsNotEmpty()
 	@IsUppercase()
 	@IsAlpha('pt-BR', {message: "currency must contains only letters"})
 	@Length(3, 3, {message: "invalid currency"})
 	@ValidateIf((obj: CreateUserDto) => !!obj.initialValue)
-	currency: string
+	currency?: string
 }

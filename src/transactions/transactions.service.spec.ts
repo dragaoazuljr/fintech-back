@@ -90,7 +90,7 @@ describe('TransactionsService', () => {
     const userFromId = "2"
 
     const mockGetPix = jest.spyOn(pixService, "getPixKeyByKey").mockResolvedValue([]);
-    const mockFindUser = jest.spyOn(usersService, "findUser").mockResolvedValue({...userTo})
+    const mockFindUser = jest.spyOn(usersService, "findUser").mockResolvedValue({...userFrom})
 
     const res = service.createTransaction(transactionData, userFromId);
 
@@ -390,8 +390,8 @@ describe('TransactionsService', () => {
         .mockResolvedValueOnce({ ...userTo})
 
     const saveTransactionSpy = 
-      jest.spyOn(service, "saveTransaction")
-          .mockResolvedValue(mockSaveTransaction)
+      jest.spyOn(service, 'saveTransaction')
+          .mockResolvedValueOnce(mockSaveTransaction)
 
     
     const res = service.createTransaction(transactionData, userFromId)

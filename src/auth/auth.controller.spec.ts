@@ -24,7 +24,6 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       imports: [
-        UsersModule,
         PassportModule.register({ defaultStrategy: "jwt" }),
         ConfigModule.forRoot({ isGlobal: true}),
         JwtModule.registerAsync({

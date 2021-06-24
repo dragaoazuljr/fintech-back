@@ -108,7 +108,7 @@ export class TransactionsService {
 		})
 	}
 
-	private saveTransaction(createTransactionDto: CreateTransactionDto, userFrom: User): Promise<Transaction> {
+	saveTransaction(createTransactionDto: CreateTransactionDto, userFrom: User): Promise<Transaction> {
 		const model = new this._transactionModel(createTransactionDto);
 
 		model.userFrom = userFrom;

@@ -1,11 +1,14 @@
 import { INestApplication } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Pix } from '../pix/schema/pix.schema';
+import { Transaction } from '../transactions/schema/transaction.schema';
 import * as request from 'supertest';
 import { mockMongoose } from './mocks/user-schema-model-mock';
 import { UserMockClassService } from './mocks/user-service.mock';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { TransactionsService } from '../transactions/transactions.service';
 
 
 describe('UsersController', () => {
@@ -23,7 +26,10 @@ describe('UsersController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
-        { provide: UsersService, useClass: UserMockClassService }
+        { provide: UsersService, useClass: UserMockClassService },
+        { provide: getModelToken(Pix.name), useValue: {} },
+        { provide: getModelToken(Transaction.name), useValue: { } },
+        { provide: TransactionsService, useValue: {} }
       ]
     })
       .overrideProvider(getModelToken('User'))

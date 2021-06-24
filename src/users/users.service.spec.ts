@@ -22,7 +22,6 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [UsersController],
       providers: [
         UsersService,
         { provide: getModelToken(User.name), useClass: UserSchemaModelMock }
