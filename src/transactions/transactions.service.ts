@@ -110,7 +110,9 @@ export class TransactionsService {
 
 	saveTransaction(createTransactionDto: CreateTransactionDto, userFrom: User): Promise<Transaction> {
 		const model = new this._transactionModel(createTransactionDto);
+		const date = new Date();
 
+		model.timestamp = date;
 		model.userFrom = userFrom;
 
 		return model.save()
@@ -160,12 +162,13 @@ export class TransactionsService {
 		const transactions = await this._transactionModel
 										.find()
 										.or([ {userFrom: userId}, {userTo: userId} ] as FilterQuery<Transaction>[])
-										.populate('userTo')
-										.populate('userFrom')
+										.populate('userTo', ['_id', 'name'])
+										.populate('userFrom', ['_id', 'name'])
 										.lean()
 										.exec()
 
-		const transactionsWithType = transactions.map(transaction => this.addTransactionType(transaction, userId))
+		const transactionsWithType = transactions
+			.map(transaction => this.addTransactionType(transaction, userId))
 
 		const filteredTransactions = filterTransactionsBy ?
 			transactionsWithType.filter(transaction => transaction.type === filterTransactionsBy) :

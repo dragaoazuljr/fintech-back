@@ -27,6 +27,9 @@ export class Transaction {
 	@Prop()
 	currency: string;
 
+	@Prop({ type: mongoose.Schema.Types.Date})
+	timestamp: Date;
+
 	type?: TransactionType
 } 
 

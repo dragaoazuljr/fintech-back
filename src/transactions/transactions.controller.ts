@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { TransactionType } from './schema/transaction.schema';
@@ -39,5 +40,16 @@ export class TransactionsController {
 	) {
 		const userId = req.user.userId;
 		return this._transactionsService.createTransaction(createTransactionDto, userId)
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@UsePipes(ValidationPipe)
+	@Post("/initial")
+	createInitialTransaction(
+		@Body() createUserDto: CreateUserDto,
+		@Req() req: any
+	) {
+		const userId = req.user.userId;
+		return this._transactionsService.createInitialTransaction(createUserDto, userId);
 	}
 }
