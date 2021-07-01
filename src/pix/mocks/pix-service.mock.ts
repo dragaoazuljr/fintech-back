@@ -3,4 +3,5 @@ export const pixServiceMock = {
 	createPixKey: () => {},
 	getPixKeyByKey: () => {},
 	removePixKey: () => {},
+	savePixKey: () => {},
 }

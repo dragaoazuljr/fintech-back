@@ -162,6 +162,7 @@ export class TransactionsService {
 		const transactions = await this._transactionModel
 										.find()
 										.or([ {userFrom: userId}, {userTo: userId} ] as FilterQuery<Transaction>[])
+										.sort({ timestamp: -1})
 										.populate('userTo', ['_id', 'name'])
 										.populate('userFrom', ['_id', 'name'])
 										.lean()
@@ -175,6 +176,12 @@ export class TransactionsService {
 			transactionsWithType
 
 		return filteredTransactions
+	}
+
+	private sortTransactions(a: Transaction, b: Transaction){
+		if (a.timestamp > b.timestamp) return 1;
+		if (a.timestamp < b.timestamp) return -1;
+		return 0;
 	}
 
 	private addTransactionType(transaction, userId): Transaction {

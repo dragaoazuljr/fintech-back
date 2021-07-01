@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { User } from 'src/users/schemas/user.schema';
 import { UsersService } from '../users/users.service';
 import { CreatePixKeyDto } from './dtos/create-pix-key.dto';
 import { Pix, PixDocument } from './schema/pix.schema';
@@ -21,27 +22,31 @@ export class PixService {
 	}
 
 	async createPixKey(createPixKeyDto: CreatePixKeyDto, requestUserId: string) {
-		if (requestUserId !== createPixKeyDto.user) throw new BadRequestException("invalid payload userId")
-
 		const existingKey = await this.getPixKeyByKey(createPixKeyDto.key)
 
 		if (existingKey.length > 0) throw new BadRequestException('key already exist');
 
-		if (!createPixKeyDto.user) throw new BadRequestException("empty user id");
+		if (!requestUserId) throw new BadRequestException("empty user id");
 
 		const validUser = await 
-			this._usersService.findUser(createPixKeyDto.user)
+			this._usersService.findUser(requestUserId)
 				.catch(err => { throw new BadRequestException("invalid userId") });;
 
 		if (!validUser) throw new BadRequestException('user does not exist');
 
-		const userKeys = await this.getKeysByUserId(createPixKeyDto.user);
+		const userKeys = await this.getKeysByUserId(requestUserId);
 
 		if (userKeys.filter(pix => pix.label === createPixKeyDto.label).length > 0) throw new BadRequestException("a key with this label already exist");
 
+		return this.savePixKey(createPixKeyDto, validUser);
+	}
+
+	savePixKey(createPixKeyDto: CreatePixKeyDto, user: User): Promise<Pix> {
 		const pixKey = new this.pixModel(createPixKeyDto);
 
-		return pixKey.save();
+		pixKey.user = user;
+
+		return pixKey.save();		
 	}
 
 	getPixKeyByKey(key: string): Promise<Pix[]>{
