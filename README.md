@@ -38,6 +38,9 @@ $ npm install
 # config .env file using the .env.model
 $ cp .env.model .env
 
+#install packages
+$ npm install
+
 # development
 $ npm run start
 
