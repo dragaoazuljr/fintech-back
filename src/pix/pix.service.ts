@@ -22,24 +22,23 @@ export class PixService {
 	}
 
 	async createPixKey(createPixKeyDto: CreatePixKeyDto, requestUserId: string) {
-		const existingKey = await this.getPixKeyByKey(createPixKeyDto.key)
-
-		if (existingKey.length > 0) throw new BadRequestException('key already exist');
-
-		if (!requestUserId) throw new BadRequestException("empty user id");
-
-		const validUser = await 
-			this._usersService.findUser(requestUserId)
-				.catch(err => { throw new BadRequestException("invalid userId") });;
-
-		if (!validUser) throw new BadRequestException('user does not exist');
-
-		const userKeys = await this.getKeysByUserId(requestUserId);
-
-		if (userKeys.filter(pix => pix.label === createPixKeyDto.label).length > 0) throw new BadRequestException("a key with this label already exist");
-
+		const validUser = await this.validateCreatePixKey(createPixKeyDto, requestUserId);
+		
 		return this.savePixKey(createPixKeyDto, validUser);
 	}
+
+	async validateCreatePixKey(createPixKeyDto: CreatePixKeyDto, requestUserId: string): Promise<User> {
+		const validUser = await this._usersService.findUser(requestUserId);
+		if (!validUser) throw new BadRequestException('user does not exist');
+		
+		const existingKey = await this.getPixKeyByKey(createPixKeyDto.key);
+		if (existingKey.length > 0) throw new BadRequestException('key already exist');
+
+		const usersKeys = await this.getKeysByUserId(requestUserId);
+		if (usersKeys.filter(pix => pix.label === createPixKeyDto.label).length > 0) throw new BadRequestException("a key with this label already exist");
+		
+		return validUser; 
+	} 
 
 	savePixKey(createPixKeyDto: CreatePixKeyDto, user: User): Promise<Pix> {
 		const pixKey = new this.pixModel(createPixKeyDto);

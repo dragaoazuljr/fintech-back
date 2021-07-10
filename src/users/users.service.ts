@@ -20,13 +20,16 @@ export class UsersService {
 
 		if (userAlreadyExist) throw new BadRequestException('user already exist');
 
-		const userCreated = new this.userModel(createUserDto);
-
-		const user = await userCreated.save();
-		return user
+		return this.saveUser(createUserDto);
 	}
 
-	findUserByLogin( email: string ) {
+	async saveUser( createUserDto: CreateUserDto ): Promise<User> {
+		const user = new this.userModel(createUserDto);
+		const userSaved = await user.save();
+		return userSaved;
+	}
+
+	findUserByLogin( email: string ): Promise<User> {
 		return this.userModel.findOne({ email }).lean().exec();
 	}
 

@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { User } from '../users/schemas/user.schema';
 import { UserMockClassService } from '../users/mocks/user-service.mock';
 import { UsersService } from '../users/users.service';
 import { CreatePixKeyDto } from './dtos/create-pix-key.dto';
@@ -15,7 +16,7 @@ describe('PixService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PixService,
-        { provide: getModelToken(Pix.name), useClass: PixSchemaModelMock },
+        { provide: getModelToken(Pix.name), useValue: {} },
         UsersService
       ],
     })
@@ -37,6 +38,15 @@ describe('PixService', () => {
       label: "email"
     };
 
+    // jest spy on getPixKeyByKey
+    const getPixKeyByKeySpy = jest.spyOn(service, 'getPixKeyByKey')
+      .mockReturnValue(Promise.resolve([{
+        key: "user@email.com",
+        label: "email",
+        user: {} as User,
+        _id: "1"
+      }]));
+
     expect(service.createPixKey(pixData, "1"))
       .rejects
       .toThrow(BadRequestException)
@@ -47,6 +57,14 @@ describe('PixService', () => {
       key: "user@otheremail.com",
       label: "office-email"
     } as CreatePixKeyDto
+
+    const getPixKeyByKeySpy = jest.spyOn(service, 'getPixKeyByKey')
+      .mockReturnValue(Promise.resolve([{
+        key: "user@email.com",
+        label: "email",
+        user: {} as User,
+        _id: "1"
+    }]));
 
     expect(service.createPixKey(pixData, "1"))
       .rejects
@@ -60,19 +78,15 @@ describe('PixService', () => {
       label: "email"
     }
 
-    expect(service.createPixKey(pixData, "1"))
-      .rejects
-      .toThrow(BadRequestException)
-  })
-  
-  it("should not create pix key when request user is different from payload", () => {
-    const pixData = {
-      user: "1",
-      key: "user@otheremail.com",
-      label: "email"     
-    };
+    const getPixKeyByKeySpy = jest.spyOn(service, 'getPixKeyByKey')
+      .mockReturnValue(Promise.resolve([{
+        key: "user@email.com",
+        label: "email",
+        user: {} as User,
+        _id: "1"
+      }]));
 
-    expect(service.createPixKey(pixData, "2"))
+    expect(service.createPixKey(pixData, "1"))
       .rejects
       .toThrow(BadRequestException)
   })
@@ -83,23 +97,32 @@ describe('PixService', () => {
       key: "user@otheremail.com",
       label: "office-email"
     }
+
+    const getPixKeyByKeySpy = jest.spyOn(service, 'getPixKeyByKey')
+      .mockReturnValue(Promise.resolve([{
+        key: "user@email.com",
+        label: "email",
+        user: {} as User,
+        _id: "1"
+      }]));
+
+    const validateCreatePixKeySpy = jest.spyOn(service, 'validateCreatePixKey')
+      .mockResolvedValue({} as User);
+
+    const savePixKeySpy = jest.spyOn(service, 'savePixKey')
+      .mockResolvedValue({} as Pix);
     
     expect(service.createPixKey(pixData, "1"))
       .toBeTruthy();
-  })
-  
-  it("should list all pix keys by userId", async () => { 
-    const _id = "1";
-    
-    const keys = await service.getKeysByUserId(_id);
-    
-    expect(keys)
-      .toHaveLength(1)
   })
 
   it("should not remove invalid pix key", () => {
     const key = "invalid-key";
     const userId = "1";
+
+    //jest spy on getKeyByUserId  
+    const getKeyByUserIdSpy = jest.spyOn(service, 'getKeysByUserId')
+      .mockResolvedValue([]);
 
     expect(service.removePixKey(key, userId))
     .rejects
@@ -109,6 +132,14 @@ describe('PixService', () => {
   it("should remove pix key", () => {
     const key = "user@email.com"
     const userId = "1";
+
+    const getKeyByUserIdSpy = jest.spyOn(service, 'getKeysByUserId')
+      .mockResolvedValue([{
+        key: "user@email.com",
+        label: "email",
+        user: {} as User,
+        _id: "1"
+      }]);
 
     expect(service.removePixKey(key, userId))
       .toBeTruthy()

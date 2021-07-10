@@ -62,6 +62,9 @@ describe('AuthService', () => {
       password: "User@123"
     }
 
+    const spyFinduserByLogin = jest.spyOn(userService, 'findUserByLogin')
+      .mockResolvedValue(null);
+
     expect(service.login(userCredentials))
       .rejects
       .toThrow(UnauthorizedException)
@@ -80,7 +83,21 @@ describe('AuthService', () => {
     .toThrow(UnauthorizedException)
   })
   
-  it('should not login user with wrong credentials', () => {})
+  it('should not login user with wrong credentials', () => {
+    const userCredentials = {
+      email: "email@email.com",
+      password: "user@10",
+    };
+
+    //spy
+    const spyFinduserByLogin = jest.spyOn(userService, 'findUserByLogin')
+      .mockResolvedValue(null);
+
+    const res = service.login(userCredentials);
+    expect(res)
+    .rejects
+    .toThrow(UnauthorizedException);
+  })
   
   it('should login user', async () => {
     const userCredentials = {

@@ -28,7 +28,7 @@ export class Transaction {
 	currency: string;
 
 	@Prop({ type: mongoose.Schema.Types.Date})
-	timestamp: Date;
+	timestamp?: Date;
 
 	type?: TransactionType
 } 

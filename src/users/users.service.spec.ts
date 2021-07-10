@@ -15,7 +15,8 @@ describe('UsersService', () => {
   const userCreated = {
     _id: "1",
     email: 'user@email.com',
-    password: 'User@10'
+    password: 'User@10',
+    name: 'User',
   };
 
   let service: UsersService;
@@ -42,19 +43,22 @@ describe('UsersService', () => {
       password: '123User@'
     };
 
+    //create spy on saveUser
+    const saveUserSpy = jest.spyOn(service, 'saveUser')
+      .mockReturnValue(Promise.resolve(userCreated));
+
     expect(service.createUser(userData))  
       .toBeTruthy();
   });
 
   it('should not create user already created', () => {
-    expect(service.createUser(userCredentials)).rejects
-  });
-   
-  it('should find user by id', async () => {
-    expect(await service.findUser(userCreated._id)).toStrictEqual(userCreated)
+    //create jest spy on findUserByLogin
+    const findUserByLoginSpy = jest.spyOn(service, 'findUserByLogin')
+      .mockReturnValue(Promise.resolve(userCreated));
+
+    expect(service.createUser(userCredentials))
+      .rejects
+      .toThrow(new BadRequestException('user already exist'));
   });
 
-  it('should find user by login', async () => {
-    expect(await service.findUserByLogin(userCreated.email)).toStrictEqual(userCreated)
-  })
 });

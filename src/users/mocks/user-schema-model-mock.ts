@@ -13,48 +13,13 @@ export class UserSchemaModelMock {
 		{ ...this.userCreated }
 	];
 
-	find({ email }) {
-		return {
-			exec: () => new Promise((resolve, rejection) => {
-				const user = this.users.find(user => user.email === email);
-				user ? resolve(user) : rejection(false);
-			}),
-			lean: () => ({
-				exec: () => new Promise((resolve, rejection) => {
-					const user = this.users.find(user => user.email === email);
-					user ? resolve(user) : rejection(false);
-				})
-			})
-		}
-	}
+	find = ({ email }) => { };
 
-	findOne({ email }) {
-		return {
-			exec: () => new Promise((resolve, rejection) => {
-				const user = this.users.find(user => user.email === email);
-				user ? resolve(user) : rejection(undefined);
-			}),
-			lean: () => ({
-				exec: () => new Promise((resolve, rejection) => {
-					const user = this.users.find(user => user.email === email);
-					user ? resolve(user) : rejection(undefined);
-				})
-			})
-		}
-	}
+	findOne = ({ email }) => { };
 
-	findById(_id) {
-		return {
-			exec: () => new Promise((resolve, rejection) => {
-				const user = this.users.find(user => user._id === _id);
-				user ? resolve(user) : rejection(false);
-			})
-		}
-	}
+	findById(_id) {	}
 
-	save(user) {
-		return new Promise((resolve, rejection) => user ? resolve(user) : rejection(false));
-	}
+	save(user) { }
 }
 
 export const mockMongoose = {

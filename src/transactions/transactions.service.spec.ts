@@ -87,10 +87,21 @@ describe('TransactionsService', () => {
       currency: "BRL"
     }
 
+    const mockPixTo = {
+      _id: "2",
+      key: "key",
+      label: "label",
+      user: { ...userTo}
+    };
+
     const userFromId = "2"
 
-    const mockGetPix = jest.spyOn(pixService, "getPixKeyByKey").mockResolvedValue([]);
-    const mockFindUser = jest.spyOn(usersService, "findUser").mockResolvedValue({...userFrom})
+    const mockGetPix = jest.spyOn(pixService, "getPixKeyByKey").mockResolvedValue([
+      mockPixTo
+    ]);
+    const mockFindUser = jest.spyOn(usersService, "findUser")
+      .mockResolvedValue({...userFrom})
+      .mockResolvedValueOnce({...userFrom, _id: "2"})
 
     const res = service.createTransaction(transactionData, userFromId);
 
@@ -100,7 +111,7 @@ describe('TransactionsService', () => {
 
     expect(res)
       .rejects
-      .toThrow("userTo has no pix with this key")
+      .toThrow("pix key does not belongs to this user")
   })
   
   it("should validate user when getting balance", () => {

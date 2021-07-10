@@ -19,52 +19,43 @@ export class TransactionsService {
 		@Inject(forwardRef(() => UsersService)) private _usersService: UsersService
 	) {}
 
-	async createTransaction (
+	async validateTransaction (createTransactionDto: CreateTransactionDto, userId: string): Promise<{
 		createTransactionDto: CreateTransactionDto,
-		userFromId: string
-	) {
-		//is userTo a valid user?
+		userFrom: User,
+		userFromBalance: Balance[]
+	}> {
+		const userFrom = await this._usersService.findUser(userId);
+		const userTo = await this._usersService.findUser(createTransactionDto.userTo);		
 
-		const userTo = 
-			await this._usersService.findUser(createTransactionDto.userTo)
-				.catch(err => { throw new BadRequestException("Invalid userTo id")});
+		if(!userFrom) throw new BadRequestException("invalid userId");
+		if(!userTo) throw new BadRequestException("invalid userTo");
+		if(userFrom._id.toString() === userTo._id.toString()) throw new BadRequestException("userTo should be different from userFrom");
+				
+		const pixTo = await this._pixService.getPixKeyByKey(createTransactionDto.pixToKey);
 
-		if (!userTo) throw new NotFoundException("UserTo not found");
-
-		// is userFrom a validUser
-
-		const userFrom = 
-			await this._usersService.findUser(userFromId)
-				.catch(err => { throw new BadRequestException("invalud userFrom id")})
-
-		if (!userFrom) throw new NotFoundException("UserFrom not found");
-
-		//userFrom is diferrent from userTo
-
-		if(userFromId === userTo._id.toString()) throw new BadRequestException("userTo should be diferent then userFrom")
-
-		//valid pix key
-
-		const pixTo = 
-			await this._pixService.getPixKeyByKey(createTransactionDto.pixToKey)
-				.catch(err => { throw new BadRequestException("invalid pix key") });
-
-		if(!pixTo.length) throw new BadRequestException("userTo has no pix with this key");
+		if(!pixTo.length) throw new BadRequestException("invalid pix key");
 
 		const pix = pixTo[0];
 
 		if (pix.user._id.toString() !== createTransactionDto.userTo) throw new BadRequestException("pix key does not belongs to this user");
 
-		//userFrom has sufficient balance to effetuate transaction?
-
-		const userFromBalance = await this.getUserBalance(userFromId);
+		const userFromBalance = await this.getUserBalance(userId);
 
 		const balanceCurrency = userFromBalance.find(balance => balance.currency === createTransactionDto.currency);
 
-		if(!balanceCurrency) throw new BadRequestException("userFrom has no balance in this currency")
-		if(createTransactionDto.value > balanceCurrency.value) throw new BadRequestException("insufficient balance to effectuate transaction")
+		if(!balanceCurrency) throw new BadRequestException("userFrom has no balance in this currency");
 
-		//create transaction model and save
+		if(createTransactionDto.value > balanceCurrency.value) throw new BadRequestException("insufficient balance to effectuate transaction");
+
+		return {createTransactionDto, userFrom, userFromBalance};
+	}
+			
+	async createTransaction (
+		createTransactionDto: CreateTransactionDto,
+		userFromId: string
+	) {
+
+		const { userFrom, userFromBalance } = await this.validateTransaction(createTransactionDto, userFromId);		//create transaction model and save
 
 		const transaction = 
 			await this.saveTransaction(createTransactionDto, userFrom)
